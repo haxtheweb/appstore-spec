@@ -1,0 +1,181 @@
+{
+  "status": 200,
+  "apps": [
+    {
+      "details": {
+        "title": "Youtube",
+        "icon": "mdi-social:youtube",
+        "color": "red",
+        "author": "Google, Youtube LLC",
+        "description": "The most popular online video sharing and remix site.",
+        "status": "available",
+        "tags": ["video", "crowdsourced"],
+        "tos": [
+          {
+            "title": "YouTube Terms of Service",
+            "link": "https://www.youtube.com/t/terms"
+          },
+          {
+            "title": "Google Privacy Policy",
+            "link": "https://policies.google.com/privacy"
+          }
+        ]
+      },
+      "connection": {
+        "protocol": "https",
+        "url": "www.googleapis.com/youtube/v3",
+        "data": {
+          "key": "{{YOUTUBE_API_KEY}}"
+        },
+        "operations": {
+          "browse": {
+            "method": "GET",
+            "endPoint": "search",
+            "pagination": {
+              "style": "page",
+              "props": {
+                "previous": "prevPageToken",
+                "next": "nextPageToken",
+                "total_items": "pageInfo.totalResults"
+              }
+            },
+            "search": {
+              "q": {
+                "title": "Search",
+                "type": "string"
+              }
+            },
+            "data": {
+              "part": "snippet",
+              "type": "video",
+              "maxResults": "20"
+            },
+            "resultMap": {
+              "defaultGizmoType": "video",
+              "items": "items",
+              "preview": {
+                "title": "snippet.title",
+                "details": "snippet.description",
+                "image": "snippet.thumbnails.default.url",
+                "id": "id.videoId"
+              },
+              "gizmo": {
+                "title": "snippet.title",
+                "description": "snippet.description",
+                "id": "id.videoId",
+                "_url_source": "https://www.youtube.com/watch?v=<%= id %>",
+                "caption": "snippet.description",
+                "citation": "snippet.channelTitle"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "details": {
+        "title": "Local files",
+        "icon": "perm-media",
+        "color": "light-blue",
+        "author": "HAXCMS",
+        "description": "HAXCMS integration for HAX uploads and browsing",
+        "status": "available",
+        "tags": ["uploads", "files"]
+      },
+      "connection": {
+        "protocol": "https",
+        "url": "example.haxcms.org",
+        "operations": {
+          "browse": {
+            "method": "GET",
+            "endPoint": "system/listFiles",
+            "pagination": {
+              "style": "link",
+              "props": {
+                "first": "page.first",
+                "next": "page.next",
+                "previous": "page.previous",
+                "last": "page.last"
+              }
+            },
+            "search": {
+              "q": {
+                "title": "Search",
+                "type": "string"
+              }
+            },
+            "data": {
+              "__HAXJWT__": true,
+              "__HAXAPPENDUPLOADENDPOINT__": true
+            },
+            "resultMap": {
+              "defaultGizmoType": "image",
+              "items": "list",
+              "preview": {
+                "title": "name",
+                "details": "mime",
+                "image": "url",
+                "id": "uuid"
+              },
+              "gizmo": {
+                "source": "url",
+                "id": "uuid",
+                "title": "name",
+                "type": "type"
+              }
+            }
+          },
+          "add": {
+            "method": "POST",
+            "endPoint": "system/saveFile",
+            "acceptsGizmoTypes": [
+              "image",
+              "video",
+              "audio",
+              "pdf",
+              "svg",
+              "document",
+              "csv"
+            ],
+            "resultMap": {
+              "item": "data.file",
+              "defaultGizmoType": "image",
+              "gizmo": {
+                "source": "url",
+                "id": "uuid"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "stax": [
+    {
+      "details": {
+        "title": "Two column Article",
+        "image": "",
+        "author": "HAXTheWeb core team",
+        "description": "Content with media to right",
+        "status": "available",
+        "rating": "0",
+        "tags": ["media"]
+      },
+      "stax": [
+        {
+          "tag": "grid-plate",
+          "properties": {
+            "layout": "2-1"
+          },
+          "content": "<h2 slot=\"col-1\">Example heading</h2><p slot=\"col-1\">Example body copy for the left column.</p><media-image slot=\"col-2\" source=\"https://example.org/example.jpg\" alt=\"Example image\"></media-image>"
+        }
+      ]
+    }
+  ],
+  "autoloader": {
+    "media-image": "@haxtheweb/media-image/media-image.js",
+    "video-player": "@haxtheweb/video-player/video-player.js",
+    "grid-plate": "@haxtheweb/grid-plate/grid-plate.js",
+    "self-check": "@haxtheweb/self-check/self-check.js"
+  }
+}
