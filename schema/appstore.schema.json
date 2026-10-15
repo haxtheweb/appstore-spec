@@ -1,0 +1,634 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/haxtheweb/appstore-spec/master/schema/appstore.schema.json",
+  "title": "HAX appstore payload",
+  "description": "What a HAX editor loads to learn its media sources (`apps`), reusable templates (`stax`) and the elements to import (`autoloader`). Served by HAXcms `generateAppStore` (PHP and Node.js) or as a static JSON file, and consumed by HaxStore._loadAppStoreData (webcomponents elements/hax-body/lib/hax-store.js). The payload is read as-is: keys must be at the top level, not wrapped in `data`.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "description": "HTTP-style status; 200 on success.",
+      "type": "integer"
+    },
+    "apps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/app"
+      }
+    },
+    "stax": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stax"
+      }
+    },
+    "autoloader": {
+      "$ref": "#/$defs/autoloader"
+    }
+  },
+  "patternProperties": {
+    "^x-": {
+      "description": "Extension key for tool-specific data HAX does not read."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "app": {
+      "type": "object",
+      "required": [
+        "details",
+        "connection"
+      ],
+      "description": "One media provider or upload target. When the platform disables `onlineMedia`, only apps with an `add` operation are loaded.",
+      "properties": {
+        "details": {
+          "$ref": "#/$defs/details"
+        },
+        "connection": {
+          "$ref": "#/$defs/connection"
+        }
+      },
+      "patternProperties": {
+        "^x-": {}
+      },
+      "additionalProperties": false
+    },
+    "details": {
+      "type": "object",
+      "required": [
+        "title",
+        "icon",
+        "tags"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Provider name. Also builds the Merlin search command (\"Search <title>\") and its `/sources/<title lowercased>` path, so keep it unique."
+        },
+        "icon": {
+          "type": "string",
+          "description": "`iconset:name`."
+        },
+        "color": {
+          "type": "string",
+          "description": "simple-colors name for the provider tile."
+        },
+        "author": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "examples": [
+            "available"
+          ]
+        },
+        "rating": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Search keywords; also added to the Merlin search command."
+        },
+        "tos": {
+          "type": "array",
+          "description": "Terms / policy links shown with the Merlin search command.",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "link"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "link": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "patternProperties": {
+        "^x-": {}
+      },
+      "additionalProperties": false
+    },
+    "connection": {
+      "type": "object",
+      "required": [
+        "protocol",
+        "url",
+        "operations"
+      ],
+      "description": "Request URLs are built as `protocol + '://' + url + '/' + operation.endPoint`, then `connection.data` + `operation.data` (+ the search term) as the query string.",
+      "properties": {
+        "protocol": {
+          "enum": [
+            "https",
+            "http"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?![a-zA-Z][a-zA-Z0-9+.-]*://)",
+          "description": "Host and base path WITHOUT the protocol, e.g. `www.googleapis.com/youtube/v3`."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Request headers. HAX adds `Authorization: Bearer <jwt>` when a HAXcms session JWT exists and no Authorization header is set."
+        },
+        "data": {
+          "$ref": "#/$defs/requestData",
+          "description": "Query values sent with every operation (API keys, defaults). Prefer brokering keys through a backend over shipping them here."
+        },
+        "auto": {
+          "type": "boolean",
+          "description": "Run the browse request as soon as the app is activated (default true)."
+        },
+        "operations": {
+          "type": "object",
+          "required": [
+            "browse"
+          ],
+          "properties": {
+            "browse": {
+              "$ref": "#/$defs/browseOperation"
+            },
+            "add": {
+              "$ref": "#/$defs/addOperation"
+            }
+          },
+          "patternProperties": {
+            "^x-": {}
+          },
+          "additionalProperties": false
+        }
+      },
+      "patternProperties": {
+        "^x-": {}
+      },
+      "additionalProperties": false
+    },
+    "requestData": {
+      "type": "object",
+      "description": "Query-string values. Special keys: `site_token` / `siteToken` become the `X-HAXCMS-Site-Token` header and are not sent in the query; `__HAXAPPENDUPLOADENDPOINT__: true` prepends HaxStore.connectionRewrites.appendUploadEndPoint (HAXcms local files). Arrays repeat the key; null sends the bare key.",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean",
+          "array",
+          "null"
+        ]
+      }
+    },
+    "operationBase": {
+      "type": "object",
+      "required": [
+        "method",
+        "endPoint",
+        "resultMap"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ]
+        },
+        "endPoint": {
+          "type": "string",
+          "pattern": "^(?!/)",
+          "description": "Path appended to `connection.url` after a `/`, so no leading slash."
+        },
+        "data": {
+          "$ref": "#/$defs/requestData"
+        },
+        "url": {
+          "type": "string",
+          "description": "Not read by HAX."
+        }
+      }
+    },
+    "browseOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/operationBase"
+        }
+      ],
+      "description": "Search / list media from the provider.",
+      "required": [
+        "method",
+        "endPoint",
+        "resultMap"
+      ],
+      "properties": {
+        "method": true,
+        "endPoint": true,
+        "data": true,
+        "url": true,
+        "search": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Search inputs. HAX currently uses ONLY THE FIRST KEY: Merlin sends the user's text as that query parameter. Further keys are not rendered; put fixed values in `data` instead.",
+          "additionalProperties": {
+            "$ref": "#/$defs/searchField"
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "description": "Paging description. Stored by hax-app-search but not used by any HAX UI today.",
+          "properties": {
+            "style": {
+              "enum": [
+                "page",
+                "offset",
+                "link"
+              ]
+            },
+            "props": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "resultMap": {
+          "$ref": "#/$defs/browseResultMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "addOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/operationBase"
+        }
+      ],
+      "description": "Upload target. HaxStore.getHaxAppStoreTargets(type) offers this app for files whose gizmo type is in `acceptsGizmoTypes`.",
+      "required": [
+        "method",
+        "endPoint",
+        "resultMap",
+        "acceptsGizmoTypes"
+      ],
+      "properties": {
+        "method": true,
+        "endPoint": true,
+        "data": true,
+        "url": true,
+        "acceptsGizmoTypes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Gizmo types this target accepts. `*` matches files HAX cannot classify (guessGizmoType returns `*`); it is not a wildcard for every type.",
+          "examples": [
+            [
+              "image",
+              "video",
+              "audio",
+              "pdf",
+              "svg",
+              "document",
+              "csv",
+              "archive",
+              "markdown",
+              "html",
+              "*"
+            ]
+          ]
+        },
+        "resultMap": {
+          "$ref": "#/$defs/addResultMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "searchField": {
+      "type": "object",
+      "required": [
+        "title",
+        "type"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "const": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string",
+          "description": "Legacy form hint (`select`). Not rendered today."
+        },
+        "items": {
+          "type": "array",
+          "description": "Legacy select options. Not rendered today."
+        },
+        "slot": {
+          "type": "array",
+          "description": "Legacy alias of `items`. Not rendered today."
+        },
+        "component": {
+          "type": "object",
+          "description": "Legacy custom input component. Not rendered today."
+        }
+      },
+      "additionalProperties": false
+    },
+    "pathOrSplit": {
+      "description": "Dot path into each result record (e.g. `snippet.title`, `data.0.media_type`), or a split rule that takes one piece of a string value.",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "required": [
+            "property",
+            "op",
+            "delimiter",
+            "position"
+          ],
+          "properties": {
+            "property": {
+              "type": "string",
+              "description": "Dot path to the source string."
+            },
+            "op": {
+              "const": "split"
+            },
+            "delimiter": {
+              "type": "string"
+            },
+            "position": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "browseResultMap": {
+      "type": "object",
+      "required": [
+        "defaultGizmoType",
+        "preview",
+        "gizmo"
+      ],
+      "description": "Maps each provider result into a preview card and the values handed to the inserted element.",
+      "properties": {
+        "defaultGizmoType": {
+          "$ref": "#/$defs/gizmoType"
+        },
+        "items": {
+          "type": "string",
+          "description": "Dot path to the result array (e.g. `items`, `data.files`). If it does not resolve, the whole response is treated as the array."
+        },
+        "image": {
+          "type": "string",
+          "description": "Fallback preview image URL used when `preview.image` is not mapped."
+        },
+        "preview": {
+          "type": "object",
+          "required": [
+            "title",
+            "details",
+            "id"
+          ],
+          "properties": {
+            "title": {
+              "$ref": "#/$defs/pathOrSplit"
+            },
+            "details": {
+              "$ref": "#/$defs/pathOrSplit",
+              "description": "HTML is stripped."
+            },
+            "image": {
+              "$ref": "#/$defs/pathOrSplit"
+            },
+            "id": {
+              "$ref": "#/$defs/pathOrSplit"
+            }
+          },
+          "additionalProperties": false
+        },
+        "gizmo": {
+          "$ref": "#/$defs/gizmoMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "addResultMap": {
+      "type": "object",
+      "required": [
+        "gizmo"
+      ],
+      "description": "Maps the upload response into the inserted element's values.",
+      "properties": {
+        "defaultGizmoType": {
+          "$ref": "#/$defs/gizmoType"
+        },
+        "item": {
+          "type": "string",
+          "description": "Dot path to the uploaded file record in the response (e.g. `data.file`)."
+        },
+        "gizmo": {
+          "$ref": "#/$defs/gizmoMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "gizmoMap": {
+      "type": "object",
+      "description": "Target value name -> dot path (or split rule) into the result record. Values become the inserted element's properties via guessGizmo. Special keys: `_url_source` is a URL template whose first `<%= id %>` is replaced by the mapped `id` and becomes `source`/`url`; `type` and `mimetype` are PATHS whose resolved value picks the gizmo type per item (for a fixed type use `defaultGizmoType`). `url` falls back to `source`.",
+      "properties": {
+        "_url_source": {
+          "type": "string",
+          "pattern": "<%= id %>"
+        },
+        "type": {
+          "$ref": "#/$defs/pathOrSplit"
+        },
+        "mimetype": {
+          "$ref": "#/$defs/pathOrSplit"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/pathOrSplit"
+      }
+    },
+    "gizmoType": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Gizmo type HAX uses to pick an element (guessGizmo), e.g. image, video, audio, pdf, document, content, wikipedia.",
+      "examples": [
+        "image",
+        "video",
+        "audio",
+        "pdf",
+        "document",
+        "csv",
+        "content",
+        "wikipedia"
+      ]
+    },
+    "stax": {
+      "type": "object",
+      "required": [
+        "details",
+        "stax"
+      ],
+      "description": "A reusable multi-element template inserted as a group.",
+      "properties": {
+        "details": {
+          "type": "object",
+          "required": [
+            "title"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "image": {
+              "type": "string"
+            },
+            "author": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "rating": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "patternProperties": {
+            "^x-": {}
+          },
+          "additionalProperties": false
+        },
+        "stax": {
+          "type": "array",
+          "minItems": 1,
+          "description": "HAXElementSchema objects (see haxtheweb/hax-element-schema), inserted in order.",
+          "items": {
+            "$ref": "#/$defs/haxElement"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "haxElement": {
+      "type": "object",
+      "required": [
+        "tag"
+      ],
+      "description": "HAXElementSchema: see haxtheweb/hax-element-schema for full conversion rules.",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "array",
+              "object"
+            ]
+          }
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "patternProperties": {
+        "^x-": {}
+      },
+      "additionalProperties": false
+    },
+    "autoloader": {
+      "description": "Elements HAX imports and treats as valid tags. Object form: tag -> module path, or tag -> `{ import, haxProperties }` to ship a definition over the wire. Array form (what HAXcms backends emit): tag names, each imported from `@haxtheweb/<tag>/<tag>.js`. HAXcms filters this list by `settings/enabledBlocks.json` when that file exists.",
+      "oneOf": [
+        {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "\\.js$",
+                "description": "Module path relative to the web component base path."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "import"
+                ],
+                "properties": {
+                  "import": {
+                    "type": "string",
+                    "pattern": "\\.js$"
+                  },
+                  "haxProperties": {
+                    "type": "object",
+                    "description": "haxProperties document (see haxtheweb/hax-schema)."
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)+$"
+          },
+          "uniqueItems": true
+        }
+      ]
+    }
+  }
+}

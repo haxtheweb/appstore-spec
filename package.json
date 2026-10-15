@@ -1,0 +1,49 @@
+{
+  "name": "@haxtheweb/appstore-spec",
+  "version": "0.1.0",
+  "description": "JSON Schema and validator for the HAX appstore payload (apps, stax, autoloader)",
+  "keywords": [
+    "hax",
+    "haxtheweb",
+    "appstore",
+    "json-schema",
+    "validator"
+  ],
+  "homepage": "https://github.com/haxtheweb/appstore-spec#readme",
+  "bugs": {
+    "url": "https://github.com/haxtheweb/issues/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haxtheweb/appstore-spec.git"
+  },
+  "license": "Apache-2.0",
+  "main": "scripts/validate.js",
+  "exports": {
+    ".": "./scripts/validate.js",
+    "./schema/*": "./schema/*",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "appstore-validate": "scripts/validate.js"
+  },
+  "files": [
+    "schema/",
+    "scripts/validate.js",
+    "example.json",
+    "examples/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "validate": "node scripts/validate.js",
+    "test": "node scripts/test.js"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

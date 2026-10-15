@@ -1,0 +1,45 @@
+{
+  "status": 200,
+  "apps": [
+    {
+      "details": {
+        "title": "Example video host",
+        "icon": "av:play-circle-filled",
+        "color": "purple",
+        "author": "Example",
+        "description": "Shows the split rule for ids embedded in a URI.",
+        "status": "available",
+        "tags": ["video"]
+      },
+      "connection": {
+        "protocol": "https",
+        "url": "api.example.com",
+        "data": { "access_token": "{{EXAMPLE_TOKEN}}" },
+        "operations": {
+          "browse": {
+            "method": "GET",
+            "endPoint": "videos",
+            "search": { "query": { "title": "Search", "type": "string" } },
+            "data": { "per_page": "20" },
+            "resultMap": {
+              "defaultGizmoType": "video",
+              "items": "data",
+              "preview": {
+                "title": "name",
+                "details": "description",
+                "image": "pictures.sizes.1.link",
+                "id": { "property": "uri", "op": "split", "delimiter": "/", "position": 2 }
+              },
+              "gizmo": {
+                "title": "name",
+                "caption": "description",
+                "id": { "property": "uri", "op": "split", "delimiter": "/", "position": 2 },
+                "_url_source": "https://videos.example.com/<%= id %>"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
