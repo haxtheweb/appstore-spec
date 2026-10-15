@@ -1,0 +1,6 @@
+{
+  "status": 200,
+  "apps": [],
+  "stax": [],
+  "autoloader": ["video-player", "media-image"]
+}

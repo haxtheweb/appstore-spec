@@ -1,0 +1,36 @@
+{
+  "status": 200,
+  "data": { "note": "wrappers are ignored" },
+  "apps": [
+    {
+      "details": { "title": "Broken", "icon": "icons:warning", "tags": [] },
+      "connection": {
+        "protocol": "https",
+        "url": "https://api.example.com",
+        "data": { "api_key": "abc123realkey" },
+        "operations": {
+          "browse": {
+            "method": "GET",
+            "endPoint": "/search",
+            "search": {
+              "q": { "title": "Search", "type": "string" },
+              "rating": { "title": "Rating", "type": "string", "format": "select", "items": [{ "value": "value", "text": "G" }, { "value": "value", "text": "PG" }] }
+            },
+            "resultMap": {
+              "defaultGizmoType": "image",
+              "items": "results",
+              "preview": { "title": "name", "details": "text" },
+              "gizmo": { "type": "video", "_url_source": "https://example.com/watch" }
+            }
+          },
+          "add": {
+            "method": "POST",
+            "endPoint": "upload",
+            "resultMap": { "gizmo": { "source": "url" } }
+          }
+        }
+      }
+    }
+  ],
+  "autoloader": ["video-player", "Bad_Tag"]
+}

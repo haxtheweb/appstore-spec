@@ -10,7 +10,44 @@ An appstore payload usually looks like:
 - `stax` - array of reusable content stacks (`hax-stax` data)
 - `autoloader` - object or array of custom element imports to preload
 
-`example.json` has a representative payload derived from current HAX integrations.
+HAX reads these keys at the top level (`HaxStore._loadAppStoreData` in webcomponents `elements/hax-body/lib/hax-store.js`). A payload wrapped in `{ "data": { ... } }` is ignored.
+
+`example.json` has a representative payload derived from current HAX integrations, and [`examples/`](examples) has more.
+
+## Machine-readable schema and validation
+
+[`schema/appstore.schema.json`](schema/appstore.schema.json) is JSON Schema draft 2020-12 with the behavior notes below embedded as descriptions. `scripts/validate.js` adds checks a schema cannot express:
+- credentials committed in `data` / `headers`
+- `search` keys HAX ignores
+- select options that all share one value
+- `gizmo.type` written as a literal instead of a path
+- `_url_source` without a `gizmo.id`
+- duplicate app titles
+
+From npm (no install needed):
+
+```bash
+npx -p @haxtheweb/appstore-spec appstore-validate path/to/appstore.json
+```
+
+From a clone:
+
+```bash
+npm install
+node scripts/validate.js example.json examples/*.json
+node scripts/validate.js --json path/to/appstore.json
+npm test
+```
+
+## Rules for tools and agents writing appstore payloads
+
+1. **Keep keys at the top level** (`status`, `apps`, `stax`, `autoloader`). Custom keys must start with `x-`.
+2. **Build URLs the way HAX does:** `protocol + "://" + url + "/" + endPoint`. So `connection.url` has no protocol, and `endPoint` has no leading slash.
+3. **Never commit real credentials.** Use a `{{NAME}}` placeholder the backend fills in, or broker the request through your backend (HAXcms does this). `site_token` in `data` is sent as the `X-HAXCMS-Site-Token` header, and a HAXcms session JWT is added as `Authorization: Bearer` automatically.
+4. **Put the text query first in `browse.search`.** Only the first key is used: Merlin sends what the user types as that parameter. Fixed filters belong in `data`.
+5. **`resultMap` values are dot paths into each result**, including `gizmo.type` and `gizmo.mimetype`. Use `defaultGizmoType` for a fixed type. `preview.title`, `preview.details` and `preview.id` are required.
+6. **`add` operations need `acceptsGizmoTypes`**, or the app is never offered as an upload target. `*` means "files HAX can't classify", not "everything".
+7. **Validate** with `scripts/validate.js` before shipping a payload.
 
 # Breaking down pieces of the specification
 
@@ -39,10 +76,13 @@ Each item in `apps` is a provider definition with `details` and `connection`.
 
 ### `connection`
 - `protocol` - `http` or `https`
-- `url` - provider host
+- `url` - provider host and base path, **without** the protocol
 - `headers` - optional request headers
-- `data` - default query/body values
-- `operations` - map of operation definitions (`browse`, `add`, optionally `read`, `edit`, `delete`)
+- `data` - default query values sent with every operation (see [Special request values](#special-request-values))
+- `auto` - optional boolean, default `true`: run the browse request as soon as the app is activated
+- `operations` - `browse` (required) and optionally `add`. HAX does not read any other operation names.
+
+When the HAXcms platform setting disables `onlineMedia`, only apps with an `add` operation are loaded.
 
 ```json
 {
@@ -71,11 +111,13 @@ Operations define how HAX talks to a provider.
 
 ### Common operation fields
 - `method` - HTTP method (`GET`, `POST`, etc)
-- `endPoint` - endpoint path appended to `connection.url`
-- `pagination` - paging style and response mappings
-- `search` - searchable form fields exposed in HAX
-- `data` - default request payload/query values
+- `endPoint` - path appended to `connection.url` after a `/` (no leading slash)
+- `data` - request query values, merged over `connection.data`
 - `resultMap` - path mappings from provider response into HAX preview/gizmo data
+
+### Browse-only fields
+- `search` - search inputs. **Only the first key is used**: Merlin's "Search <app title>" command sends the user's text as that query parameter. Further keys, and the legacy `format` / `items` / `slot` / `component` hints, are not rendered by current HAX, so put fixed filters in `data`.
+- `pagination` - `{ style: "page" | "offset" | "link", props: {...} }`. Stored but not used by any HAX UI today.
 
 ### Browse operation
 `browse` is the standard operation for searching/selecting media.
@@ -150,10 +192,20 @@ Operations define how HAX talks to a provider.
 ## `resultMap` conventions
 `resultMap` maps upstream API response data into HAX item previews and final gizmo values.
 
-- `items` - path to array of result records
-- `preview` - fields shown in listing UI (`title`, `details`, `image`, `id`)
-- `gizmo` - fields used when inserting selected media into content
-- `_url_source` - templated URL composition using `<%= id %>` style replacement
+- `items` - dot path to the array of result records. If it doesn't resolve, the whole response is used as the array.
+- `preview` - fields shown in result cards: `title`, `details` (HTML stripped) and `id` are required; `image` is optional, with `resultMap.image` as a fixed fallback.
+- `gizmo` - target value -> dot path. These become the inserted element's properties via `guessGizmo`.
+- `defaultGizmoType` - gizmo type for every result (`image`, `video`, `audio`, `pdf`, `document`, `content`, `wikipedia`, ...).
+- `gizmo.type` / `gizmo.mimetype` - **paths** whose resolved value picks the gizmo type per result (e.g. `"type": "data.0.media_type"`). Writing `"type": "video"` looks up `result.video`.
+- `_url_source` - URL template; the first `<%= id %>` is replaced by the mapped `gizmo.id`, and the result becomes `source` and `url`.
+- Split rule: any `preview` or `gizmo` value can be `{ "property": "uri", "op": "split", "delimiter": "/", "position": 2 }` to take one piece of a string (see [`examples/split-id.json`](examples/split-id.json)).
+- `add` result maps use `item` (path to the uploaded record, e.g. `data.file`) instead of `items`.
+
+## Special request values
+- `site_token` / `siteToken` in `data` - sent as the `X-HAXCMS-Site-Token` header, never in the query string.
+- `__HAXAPPENDUPLOADENDPOINT__: true` - prepends `HaxStore.connectionRewrites.appendUploadEndPoint` to the query (HAXcms local files).
+- Array values repeat the parameter; `null` sends the bare key.
+- A HAXcms session JWT, when present, is sent as `Authorization: Bearer <jwt>` unless you set `Authorization` yourself. (The older `__HAXJWT__` placeholder is no longer read.)
 
 ## Stax
 `stax` is an array of named content stacks (HAX elements) users can insert as reusable patterns.
@@ -183,8 +235,10 @@ Operations define how HAX talks to a provider.
 `autoloader` declares custom elements that should be available to HAX.
 
 Supported formats:
-- object map (`tagName -> importPath`)
-- array of tag names (legacy format)
+- object map: `tagName -> importPath`, or `tagName -> { "import": path, "haxProperties": {...} }` to ship an element's HAX definition over the wire
+- array of tag names, each imported from `@haxtheweb/<tag>/<tag>.js`. This is what the HAXcms PHP and Node.js backends emit.
+
+HAXcms filters the autoloader by `settings/enabledBlocks.json` when that file exists.
 
 ```json
 {
@@ -199,4 +253,4 @@ Supported formats:
 ## Integration notes
 - Backends can serve appstore payloads from static JSON or dynamic endpoint generation.
 - In HAXCMS, provider search can be brokered through backend endpoints so API keys are not exposed to the browser.
-- For HAXCMS local file integrations, values like `__HAXJWT__` and `__HAXAPPENDUPLOADENDPOINT__` are recognized conventions used by upload/list operations.
+- For HAXCMS local file integrations, `__HAXAPPENDUPLOADENDPOINT__` and `site_token` are the recognized special values (see [Special request values](#special-request-values)).

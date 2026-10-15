@@ -2,6 +2,14 @@
 
 This file provides comprehensive instructions for AI coding agents working within the HAX ecosystem. HAX (Headless Authoring eXperience) is a comprehensive web development ecosystem that enables rapid creation of accessible, performant web components and static sites. Follow these guidelines to set up, develop, test, and contribute effectively to HAX projects.
 
+## This repository (appstore-spec)
+
+Repo-specific notes; the rest of this file is the shared ecosystem guide.
+
+- **What lives here:** the appstore spec (README.md), its JSON Schema in `schema/`, a validator in `scripts/validate.js`, and examples in `example.json` and `examples/` (`invalid/` = mistakes the validator catches).
+- **Writing or editing an appstore payload:** read "Rules for tools and agents writing appstore payloads" in README.md, then run `node scripts/validate.js <file>` (add `--json` for a structured report). Never commit real API keys.
+- **Keep prose and schema in sync:** a behavior change means editing README.md, the schema and an example in the same PR; `npm test` must pass. The source of truth is `HaxStore._loadAppStoreData`, `hax-app-search.js` and `hax-upload-field.js` in webcomponents, plus `generateAppStore` in haxcms-php / haxcms-nodejs.
+
 ## HAX Ecosystem Overview
 
 The HAX ecosystem consists of multiple interconnected repositories, each serving specific purposes:

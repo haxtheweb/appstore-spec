@@ -1,0 +1,58 @@
+{
+  "status": 200,
+  "apps": [
+    {
+      "details": {
+        "title": "Local files",
+        "icon": "hax:hax2022",
+        "color": "light-blue",
+        "author": "HAXTheWeb",
+        "description": "HAXcms file system integration",
+        "status": "available",
+        "tags": ["local", "files", "upload"]
+      },
+      "connection": {
+        "protocol": "https",
+        "url": "example.com/x/api/v1",
+        "headers": { "X-HAXCMS-Site-Token": "{{SITE_TOKEN}}" },
+        "operations": {
+          "browse": {
+            "method": "GET",
+            "endPoint": "files",
+            "search": {
+              "filename": { "title": "File name", "type": "string" }
+            },
+            "data": { "__HAXAPPENDUPLOADENDPOINT__": true },
+            "resultMap": {
+              "defaultGizmoType": "image",
+              "items": "data.files",
+              "preview": { "title": "name", "details": "mimetype", "image": "fullUrl", "id": "uuid" },
+              "gizmo": { "source": "url", "id": "uuid", "title": "name", "mimetype": "mimetype" }
+            }
+          },
+          "add": {
+            "method": "POST",
+            "endPoint": "files",
+            "acceptsGizmoTypes": ["image", "video", "audio", "pdf", "svg", "document", "csv", "*"],
+            "resultMap": {
+              "item": "data.file",
+              "defaultGizmoType": "image",
+              "gizmo": { "source": "url", "id": "uuid", "type": "type" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "autoloader": {
+    "media-image": "@haxtheweb/media-image/media-image.js",
+    "my-local-element": {
+      "import": "@my-org/my-local-element/my-local-element.js",
+      "haxProperties": {
+        "gizmo": { "title": "My element", "icon": "icons:android", "tags": ["Other"] },
+        "settings": { "configure": [] },
+        "demoSchema": [{ "tag": "my-local-element", "properties": {}, "content": "" }]
+      }
+    }
+  }
+}
