@@ -254,3 +254,7 @@ HAXcms filters the autoloader by `settings/enabledBlocks.json` when that file ex
 - Backends can serve appstore payloads from static JSON or dynamic endpoint generation.
 - In HAXCMS, provider search can be brokered through backend endpoints so API keys are not exposed to the browser.
 - For HAXCMS local file integrations, `__HAXAPPENDUPLOADENDPOINT__` and `site_token` are the recognized special values (see [Special request values](#special-request-values)).
+
+## Releasing
+
+This package is versioned with the rest of the HAX ecosystem and is published by the ubiquity release (`scripts/ubiquity-push.sh` in haxtheweb/webcomponents), which runs `commit-and-tag-version --release-as <ecosystem version>`, pushes the tag and runs `npm publish`. To cut a release of just this package, run `npm run release` (tests, bumps the version and CHANGELOG, tags, pushes to `master`, publishes).
