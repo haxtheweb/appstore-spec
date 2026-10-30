@@ -1,0 +1,27 @@
+# appstore-spec
+
+> Documentation for the HAX appstore specification: external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.
+
+HAXcms is a file-based CMS: authored pages and metadata are stored as portable files, not locked into a database-only workflow.
+The canonical site structure is `site.json`, represented in JSON Outline Schema (`id`, `parent`, `order`, `slug`, `location`, and `metadata`).
+Use HAX CLI and ecosystem tooling to maintain human-authored content while keeping machine-readable outputs synchronized.
+Managed files (feeds, search indexes, manifests, and this `llms.txt`) are generated artifacts and should be rebuilt by tooling.
+
+## Core resources
+- [site.json](https://localhost/appstore-spec-docs/site.json): Canonical site manifest and navigation tree in JSON Outline Schema format.
+- [llms.txt](https://localhost/appstore-spec-docs/llms.txt): LLM-oriented guide to this site and its machine-readable resources.
+
+## Pages
+- [Overview](https://localhost/appstore-spec-docs/pages/item-5d0b7d94-1d06-4045-b30e-c219666447d7/index.md)
+- [Apps & Connections](https://localhost/appstore-spec-docs/pages/item-e5f1a280-609c-4375-b28d-7ce7eb733401/index.md)
+- [Operations](https://localhost/appstore-spec-docs/pages/item-6794d59f-b4f0-48e5-9e50-c8e78de1f37c/index.md)
+- [resultMap & Special Values](https://localhost/appstore-spec-docs/pages/item-b8dabe1b-1119-465f-9e5d-0abf03efcf5a/index.md)
+- [Stax & Autoloader](https://localhost/appstore-spec-docs/pages/item-205ac627-1f06-4821-8bfd-dad2341a8b07/index.md)
+- [More Schemas](https://localhost/appstore-spec-docs/pages/item-fe2c6999-920e-4df3-8b80-aff167b827b1/index.md)
+
+## Optional
+- [Search index](https://localhost/appstore-spec-docs/lunrSearchIndex.json): Lunr corpus for quick full-text retrieval.
+- [RSS feed](https://localhost/appstore-spec-docs/rss.xml): Site updates in RSS format.
+- [Atom feed](https://localhost/appstore-spec-docs/atom.xml): Site updates in Atom format.
+- [Sitemap](https://localhost/appstore-spec-docs/sitemap.xml): URL-level discovery map for the published site.
+- [Agent skills](https://localhost/appstore-spec-docs/.well-known/agent-skills/index.json): Agent Skills discovery index (agentskills.io v0.2.0) listing skills that teach an agent how to read, author, audit, and remix this site.

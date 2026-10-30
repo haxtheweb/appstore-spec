@@ -1,0 +1,58 @@
+<h2>Stax</h2>
+<p><code>stax</code> is an array of named content stacks (HAX elements) users can insert as reusable patterns.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "details": {
+    "title": "Two column Article",
+    "author": "HAXTheWeb core team",
+    "description": "Content with media to right",
+    "status": "available",
+    "tags": ["media"]
+  },
+  "stax": [
+    {
+      "tag": "grid-plate",
+      "properties": {
+        "layout": "2-1"
+      },
+      "content": "&lt;p slot=\"col-1\"&gt;Example text&lt;/p&gt;&lt;media-image slot=\"col-2\" source=\"https://example.org/image.jpg\"&gt;&lt;/media-image&gt;"
+    }
+  ]
+}
+</template>
+</code-sample>
+<h2>Autoloader</h2>
+<p><code>autoloader</code> declares custom elements that should be available to HAX. Two formats are supported:</p>
+<ul>
+<li>An object map: <code>tagName -&gt; importPath</code>, or <code>tagName -&gt; { "import": path, "haxProperties": {...} }</code> to ship an element's HAX definition over the wire.</li>
+<li>An array of tag names, each imported from <code>@haxtheweb/&lt;tag&gt;/&lt;tag&gt;.js</code>. This is what the HAXcms PHP and Node.js backends emit.</li>
+</ul>
+<p>HAXcms filters the autoloader by <code>settings/enabledBlocks.json</code> when that file exists.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "autoloader": {
+    "media-image": "@haxtheweb/media-image/media-image.js",
+    "video-player": "@haxtheweb/video-player/video-player.js",
+    "grid-plate": "@haxtheweb/grid-plate/grid-plate.js"
+  }
+}
+</template>
+</code-sample>
+<h2>Integration notes</h2>
+<ul>
+<li>Backends can serve appstore payloads from static JSON or dynamic endpoint generation.</li>
+<li>In HAXCMS, provider search can be brokered through backend endpoints so API keys are not exposed to the browser.</li>
+<li>For HAXCMS local file integrations, <code>__HAXAPPENDUPLOADENDPOINT__</code> and <code>site_token</code> are the recognized special values.</li>
+</ul>
+<h2>Rules for tools and agents writing appstore payloads</h2>
+<ol>
+<li>Keep keys at the top level (<code>status</code>, <code>apps</code>, <code>stax</code>, <code>autoloader</code>). Custom keys must start with <code>x-</code>.</li>
+<li>Build URLs the way HAX does: <code>protocol + "://" + url + "/" + endPoint</code>. So <code>connection.url</code> has no protocol, and <code>endPoint</code> has no leading slash.</li>
+<li>Never commit real credentials. Use a <code>{{NAME}}</code> placeholder the backend fills in, or broker the request through your backend.</li>
+<li>Put the text query first in <code>browse.search</code>. Only the first key is used.</li>
+<li><code>resultMap</code> values are dot paths into each result, including <code>gizmo.type</code> and <code>gizmo.mimetype</code>. Use <code>defaultGizmoType</code> for a fixed type. <code>preview.title</code>, <code>preview.details</code> and <code>preview.id</code> are required.</li>
+<li><code>add</code> operations need <code>acceptsGizmoTypes</code>, or the app is never offered as an upload target.</li>
+<li>Validate with <code>scripts/validate.js</code> before shipping a payload.</li>
+</ol>

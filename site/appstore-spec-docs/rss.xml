@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>appstore-spec</title>
+    <link>https://localhost/appstore-spec-docs/</link>
+    <description>Documentation for the HAX appstore specification: external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.</description>
+    <copyright>Copyright (C) 2026 https://localhost/appstore-spec-docs</copyright>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 30 Oct 2026 18:07:00 GMT</lastBuildDate>
+    <generator>HAXcms NodeJS</generator>
+    <atom:link href="https://localhost/appstore-spec-docs/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Overview</title>
+      <link>https://localhost/appstore-spec-docs/welcome</link>
+      <description>appstore-spec documents the HAX appstore specification: the schema that defines external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor. An appstore payload is typically returned by a backend endpoint (for example generateAppStore ) or loaded from a static JSON file. HAX reads these keys at the top level via HaxStore._loadAppStoreData in webcomponents elements/hax-body/lib/hax-store.js . A payload wrapped in { &quot;data&quot;: { ... } } is ignored....</description>
+      <guid>https://localhost/appstore-spec-docs/welcome</guid>
+      <pubDate>Fri, 30 Oct 2026 18:06:59 GMT</pubDate>
+    </item>
+    <item>
+      <title>Apps &amp; Connections</title>
+      <link>https://localhost/appstore-spec-docs/apps-connections</link>
+      <description>Each item in apps is a provider definition with a details block (display information) and a connection block (how HAX talks to the provider). details fields title — provider display label. icon — icon used in the HAX UI. color — accent color for the provider card. author — provider owner / source. description — short description shown in the UI. status — provider state (commonly available ). tags — searchable categorization terms. tos — optional terms / policy links. connection fields protoco...</description>
+      <guid>https://localhost/appstore-spec-docs/apps-connections</guid>
+      <pubDate>Fri, 30 Oct 2026 18:09:11 GMT</pubDate>
+    </item>
+    <item>
+      <title>Operations</title>
+      <link>https://localhost/appstore-spec-docs/operations</link>
+      <description>Operations define how HAX talks to a provider. Each app&apos;s connection.operations object supports a required browse operation and an optional add operation. Common operation fields method — HTTP method ( GET , POST , etc). endPoint — path appended to connection.url after a / (no leading slash). data — request query values, merged over connection.data . resultMap — path mappings from the provider response into HAX preview/gizmo data. Browse-only fields search — search inputs. Only the first key ...</description>
+      <guid>https://localhost/appstore-spec-docs/operations</guid>
+      <pubDate>Fri, 30 Oct 2026 18:09:16 GMT</pubDate>
+    </item>
+    <item>
+      <title>resultMap &amp; Special Values</title>
+      <link>https://localhost/appstore-spec-docs/resultmap-special-values</link>
+      <description>resultMap maps upstream API response data into HAX item previews and final gizmo values. resultMap fields items — dot path to the array of result records. If it doesn&apos;t resolve, the whole response is used as the array. preview — fields shown in result cards: title , details (HTML stripped) and id are required; image is optional, with resultMap.image as a fixed fallback. gizmo — target value to dot path mappings. These become the inserted element&apos;s properties via guessGizmo . defaultGizmoType ...</description>
+      <guid>https://localhost/appstore-spec-docs/resultmap-special-values</guid>
+      <pubDate>Fri, 30 Oct 2026 18:09:20 GMT</pubDate>
+    </item>
+    <item>
+      <title>Stax &amp; Autoloader</title>
+      <link>https://localhost/appstore-spec-docs/stax-autoloader</link>
+      <description>Stax stax is an array of named content stacks (HAX elements) users can insert as reusable patterns. { &quot;details&quot;: { &quot;title&quot;: &quot;Two column Article&quot;, &quot;author&quot;: &quot;HAXTheWeb core team&quot;, &quot;description&quot;: &quot;Content with media to right&quot;, &quot;status&quot;: &quot;available&quot;, &quot;tags&quot;: [&quot;media&quot;] }, &quot;stax&quot;: [ { &quot;tag&quot;: &quot;grid-plate&quot;, &quot;properties&quot;: { &quot;layout&quot;: &quot;2-1&quot; }, &quot;content&quot;: &quot;&amp;lt;p slot=\&quot;col-1\&quot;&amp;gt;Example text&amp;lt;/p&amp;gt;&amp;lt;media-image slot=\&quot;col-2\&quot; source=\&quot;https://example.org/image.jpg\&quot;&amp;gt;&amp;lt;/media-image&amp;gt;&quot; } ] }...</description>
+      <guid>https://localhost/appstore-spec-docs/stax-autoloader</guid>
+      <pubDate>Fri, 30 Oct 2026 18:09:24 GMT</pubDate>
+    </item>
+    <item>
+      <title>More Schemas</title>
+      <link>https://localhost/appstore-spec-docs/more-schemas</link>
+      <description>appstore-spec is one of several schema specifications in the HAX ecosystem. Explore the others: JSON Outline Schema — the content structure, site navigation, and metadata schema used by HAXcms. HAX Schema — the full haxProperties contract for element authoring. HAX Element Schema — the lightweight virtual DOM object format used for demoSchema, insertion, and conversion workflows. Merlin Schema — the schema for Merlin&apos;s conversational options, programs, and voice/shortcut metadata. New to HAX?...</description>
+      <guid>https://localhost/appstore-spec-docs/more-schemas</guid>
+      <pubDate>Fri, 30 Oct 2026 18:09:29 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

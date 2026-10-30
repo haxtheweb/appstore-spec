@@ -1,0 +1,156 @@
+id: item-6794d59f-b4f0-48e5-9e50-c8e78de1f37c
+indent: 0
+location: pages/item-6794d59f-b4f0-48e5-9e50-c8e78de1f37c/index.yaml
+slug: operations
+order: 2
+parent: null
+title: Operations
+description: ''
+metadata:
+  created: 1793383756
+  updated: 1793383756
+  images: []
+  videos: []
+content: >-
+  <p>Operations define how HAX talks to a provider. Each app's
+  <code>connection.operations</code> object supports a required
+  <code>browse</code> operation and an optional <code>add</code> operation.</p>
+
+  <a11y-collapse heading-button="heading-button">
+
+  <h2 slot="heading">Common operation fields</h2>
+
+  <div slot="content">
+
+  <ul>
+
+  <li><strong>method</strong> — HTTP method (<code>GET</code>,
+  <code>POST</code>, etc).</li>
+
+  <li><strong>endPoint</strong> — path appended to <code>connection.url</code>
+  after a <code>/</code> (no leading slash).</li>
+
+  <li><strong>data</strong> — request query values, merged over
+  <code>connection.data</code>.</li>
+
+  <li><strong>resultMap</strong> — path mappings from the provider response into
+  HAX preview/gizmo data.</li>
+
+  </ul>
+
+  </div>
+
+  </a11y-collapse>
+
+  <a11y-collapse heading-button="heading-button">
+
+  <h2 slot="heading">Browse-only fields</h2>
+
+  <div slot="content">
+
+  <ul>
+
+  <li><strong>search</strong> — search inputs. Only the first key is used:
+  Merlin's "Search &lt;app title&gt;" command sends the user's text as that
+  query parameter. Further keys, and the legacy <code>format</code> /
+  <code>items</code> / <code>slot</code> / <code>component</code> hints, are not
+  rendered by current HAX, so put fixed filters in <code>data</code>.</li>
+
+  <li><strong>pagination</strong> — <code>{ style: "page" | "offset" | "link",
+  props: {...} }</code>. Stored but not used by any HAX UI today.</li>
+
+  </ul>
+
+  </div>
+
+  </a11y-collapse>
+
+  <h2>Browse operation</h2>
+
+  <p><code>browse</code> is the standard operation for searching and selecting
+  media.</p>
+
+  <code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+
+  <template>
+
+  {
+    "browse": {
+      "method": "GET",
+      "endPoint": "search",
+      "pagination": {
+        "style": "page",
+        "props": {
+          "previous": "prevPageToken",
+          "next": "nextPageToken",
+          "total_items": "pageInfo.totalResults"
+        }
+      },
+      "search": {
+        "q": {
+          "title": "Search",
+          "type": "string"
+        }
+      },
+      "data": {
+        "part": "snippet",
+        "type": "video",
+        "maxResults": "20"
+      },
+      "resultMap": {
+        "defaultGizmoType": "video",
+        "items": "items",
+        "preview": {
+          "title": "snippet.title",
+          "details": "snippet.description",
+          "image": "snippet.thumbnails.default.url",
+          "id": "id.videoId"
+        },
+        "gizmo": {
+          "title": "snippet.title",
+          "description": "snippet.description",
+          "id": "id.videoId",
+          "_url_source": "https://www.youtube.com/watch?v=&lt;%= id %&gt;",
+          "caption": "snippet.description",
+          "citation": "snippet.channelTitle"
+        }
+      }
+    }
+  }
+
+  </template>
+
+  </code-sample>
+
+  <h2>Add operation</h2>
+
+  <p><code>add</code> is used for upload/create flows, for example local file
+  upload in HAXCMS integrations.</p>
+
+  <code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+
+  <template>
+
+  {
+    "add": {
+      "method": "POST",
+      "endPoint": "system/saveFile",
+      "acceptsGizmoTypes": ["image", "video", "audio", "pdf", "svg", "document", "csv"],
+      "resultMap": {
+        "item": "data.file",
+        "defaultGizmoType": "image",
+        "gizmo": {
+          "source": "url",
+          "id": "uuid"
+        }
+      }
+    }
+  }
+
+  </template>
+
+  </code-sample>
+
+  <p>An <code>add</code> operation needs <code>acceptsGizmoTypes</code>, or the
+  app is never offered as an upload target. <code>*</code> means "files HAX
+  can't classify," not "everything."</p>

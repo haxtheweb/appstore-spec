@@ -1,4 +1,6 @@
 # appstore-spec
+📖 **[Browse the rendered docs](https://haxtheweb.github.io/appstore-spec/)**
+
 Documentation for the HAX appstore specification, the schema that defines external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.
 
 The appstore spec is typically returned by a backend endpoint (for example `generateAppStore`) or loaded from a static JSON file.

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item>
+<id>item-fe2c6999-920e-4df3-8b80-aff167b827b1</id>
+<indent>0</indent>
+<location>pages/item-fe2c6999-920e-4df3-8b80-aff167b827b1/index.xml</location>
+<slug>more-schemas</slug>
+<order>5</order>
+<parent></parent>
+<title>More Schemas</title>
+<description></description>
+<metadata>
+<created>1793383769</created>
+<updated>1793383769</updated>
+<images>
+</images>
+<videos>
+</videos>
+</metadata>
+<content><![CDATA[<p>appstore-spec is one of several schema specifications in the HAX ecosystem. Explore the others:</p>
+<ul>
+<li><a href="https://haxtheweb.github.io/json-outline-schema/">JSON Outline Schema</a> — the content structure, site navigation, and metadata schema used by HAXcms.</li>
+<li><a href="https://haxtheweb.github.io/hax-schema/">HAX Schema</a> — the full haxProperties contract for element authoring.</li>
+<li><a href="https://haxtheweb.github.io/hax-element-schema/">HAX Element Schema</a> — the lightweight virtual DOM object format used for demoSchema, insertion, and conversion workflows.</li>
+<li><a href="https://haxtheweb.github.io/merlin-schema/">Merlin Schema</a> — the schema for Merlin's conversational options, programs, and voice/shortcut metadata.</li>
+</ul>
+<p>New to HAX? <a href="https://haxtheweb.org/">Get started with HAX</a>.</p>]]></content>
+</item>

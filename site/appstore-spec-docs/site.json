@@ -1,0 +1,157 @@
+{
+  "id": "84fc489e-04ea-42b5-956c-7e7875b86c16",
+  "title": "appstore-spec",
+  "author": "HAXTheWeb core team",
+  "description": "Documentation for the HAX appstore specification: external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.",
+  "license": "by-sa",
+  "metadata": {
+    "author": {},
+    "site": {
+      "name": "appstore-spec-docs",
+      "logo": "assets/banner.jpg",
+      "settings": {
+        "lang": "en-US",
+        "publishPagesOn": true,
+        "canonical": true,
+        "pathauto": true
+      },
+      "created": 1793383620,
+      "updated": 1793383620,
+      "git": {
+        "vendor": "github",
+        "branch": "gh-pages"
+      }
+    },
+    "theme": {
+      "element": "clean-one",
+      "path": "@haxtheweb/clean-one/clean-one.js",
+      "name": "Clean One",
+      "thumbnail": "@haxtheweb/haxcms-elements/lib/theme-screenshots/theme-clean-one-thumb.jpg",
+      "description": "Start with a blank site using the Clean One",
+      "category": [
+        "Course"
+      ],
+      "hidden": false,
+      "priority": -2,
+      "terrible": false,
+      "supportedPalettes": [
+        "4",
+        "5"
+      ],
+      "variables": {
+        "hexCode": "#1e407c",
+        "cssVariable": "--ddd-primary-1",
+        "icon": "icons:book"
+      }
+    },
+    "node": {
+      "fields": {}
+    },
+    "platform": {
+      "audience": "expert",
+      "features": {},
+      "allowedBlocks": []
+    },
+    "build": {
+      "version": "26.8.0",
+      "structure": "course",
+      "type": "own"
+    }
+  },
+  "items": [
+    {
+      "id": "item-5d0b7d94-1d06-4045-b30e-c219666447d7",
+      "indent": 0,
+      "location": "pages/item-5d0b7d94-1d06-4045-b30e-c219666447d7/index.html",
+      "slug": "welcome",
+      "order": 0,
+      "parent": null,
+      "title": "Overview",
+      "description": "",
+      "metadata": {
+        "created": 1793383619,
+        "updated": 1793383619
+      }
+    },
+    {
+      "id": "item-e5f1a280-609c-4375-b28d-7ce7eb733401",
+      "indent": 0,
+      "location": "pages/item-e5f1a280-609c-4375-b28d-7ce7eb733401/index.html",
+      "slug": "apps-connections",
+      "order": 1,
+      "parent": null,
+      "title": "Apps & Connections",
+      "description": "",
+      "metadata": {
+        "created": 1793383751,
+        "updated": 1793383751,
+        "images": [],
+        "videos": []
+      }
+    },
+    {
+      "id": "item-6794d59f-b4f0-48e5-9e50-c8e78de1f37c",
+      "indent": 0,
+      "location": "pages/item-6794d59f-b4f0-48e5-9e50-c8e78de1f37c/index.html",
+      "slug": "operations",
+      "order": 2,
+      "parent": null,
+      "title": "Operations",
+      "description": "",
+      "metadata": {
+        "created": 1793383756,
+        "updated": 1793383756,
+        "images": [],
+        "videos": []
+      }
+    },
+    {
+      "id": "item-b8dabe1b-1119-465f-9e5d-0abf03efcf5a",
+      "indent": 0,
+      "location": "pages/item-b8dabe1b-1119-465f-9e5d-0abf03efcf5a/index.html",
+      "slug": "resultmap-special-values",
+      "order": 3,
+      "parent": null,
+      "title": "resultMap & Special Values",
+      "description": "",
+      "metadata": {
+        "created": 1793383760,
+        "updated": 1793383760,
+        "images": [],
+        "videos": []
+      }
+    },
+    {
+      "id": "item-205ac627-1f06-4821-8bfd-dad2341a8b07",
+      "indent": 0,
+      "location": "pages/item-205ac627-1f06-4821-8bfd-dad2341a8b07/index.html",
+      "slug": "stax-autoloader",
+      "order": 4,
+      "parent": null,
+      "title": "Stax & Autoloader",
+      "description": "",
+      "metadata": {
+        "created": 1793383764,
+        "updated": 1793383764,
+        "images": [],
+        "videos": []
+      }
+    },
+    {
+      "id": "item-fe2c6999-920e-4df3-8b80-aff167b827b1",
+      "indent": 0,
+      "location": "pages/item-fe2c6999-920e-4df3-8b80-aff167b827b1/index.html",
+      "slug": "more-schemas",
+      "order": 5,
+      "parent": null,
+      "title": "More Schemas",
+      "description": "",
+      "metadata": {
+        "created": 1793383769,
+        "updated": 1793383769,
+        "images": [],
+        "videos": []
+      }
+    }
+  ]
+}

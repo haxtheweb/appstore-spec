@@ -1,0 +1,15 @@
+{
+  "id": "item-5d0b7d94-1d06-4045-b30e-c219666447d7",
+  "indent": 0,
+  "location": "pages/item-5d0b7d94-1d06-4045-b30e-c219666447d7/index.json",
+  "slug": "welcome",
+  "order": 0,
+  "parent": null,
+  "title": "Overview",
+  "description": "",
+  "metadata": {
+    "created": 1793383619,
+    "updated": 1793383619
+  },
+  "content": "<p>appstore-spec documents the HAX appstore specification: the schema that defines external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.</p>\n<p>An appstore payload is typically returned by a backend endpoint (for example <code>generateAppStore</code>) or loaded from a static JSON file. HAX reads these keys at the top level via <code>HaxStore._loadAppStoreData</code> in webcomponents <code>elements/hax-body/lib/hax-store.js</code>. A payload wrapped in <code>{ \"data\": { ... } }</code> is ignored.</p>\n<h2>Root structure</h2>\n<p>An appstore payload usually looks like:</p>\n<code-sample type=\"json\" copy-clipboard-button=\"copy-clipboard-button\">\n<template>\n{\n  \"status\": 200,\n  \"apps\": [],\n  \"stax\": [],\n  \"autoloader\": {}\n}\n</template>\n</code-sample>\n<a11y-collapse heading-button=\"heading-button\">\n<h2 slot=\"heading\">Top-level keys</h2>\n<div slot=\"content\">\n<ul>\n<li><strong>status</strong> — numeric status code (typically <code>200</code>).</li>\n<li><strong>apps</strong> — array of app provider definitions (<code>hax-app</code> data).</li>\n<li><strong>stax</strong> — array of reusable content stacks (<code>hax-stax</code> data).</li>\n<li><strong>autoloader</strong> — object or array of custom element imports to preload.</li>\n</ul>\n</div>\n</a11y-collapse>\n<p><code>example.json</code> in the repository has a representative payload derived from current HAX integrations, and the <code>examples/</code> directory has more, including an <code>invalid/</code> subfolder of mistakes the validator catches.</p>\n<h2>Machine-readable schema and validation</h2>\n<p><code>schema/appstore.schema.json</code> is JSON Schema draft 2020-12 with the behavior notes in this documentation embedded as descriptions. <code>scripts/validate.js</code> adds checks a schema cannot express, including:</p>\n<ul>\n<li>credentials committed in <code>data</code> / <code>headers</code></li>\n<li><code>search</code> keys HAX ignores</li>\n<li>select options that all share one value</li>\n<li><code>gizmo.type</code> written as a literal instead of a path</li>\n<li><code>_url_source</code> without a <code>gizmo.id</code></li>\n<li>duplicate app titles</li>\n</ul>\n<p>From npm, without installing anything:</p>\n<code-sample type=\"javascript\" copy-clipboard-button=\"copy-clipboard-button\">\n<template>\nnpx -p @haxtheweb/appstore-spec appstore-validate path/to/appstore.json\n</template>\n</code-sample>\n<p>From a clone of this repository:</p>\n<code-sample type=\"javascript\" copy-clipboard-button=\"copy-clipboard-button\">\n<template>\nnpm install\nnode scripts/validate.js example.json examples/*.json\nnode scripts/validate.js --json path/to/appstore.json\nnpm test\n</template>\n</code-sample>"
+}

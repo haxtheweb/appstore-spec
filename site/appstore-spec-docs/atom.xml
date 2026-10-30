@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>appstore-spec</title>
+  <link href="https://localhost/appstore-spec-docs/" rel="self" />
+  <subtitle>Documentation for the HAX appstore specification: external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.</subtitle>
+  <updated>2026-10-30T18:07:00.000Z</updated>
+  <author>
+      <name>HAXTheWeb core team</name>
+  </author>
+  <id>https://localhost/appstore-spec-docs/</id>
+  
+  <entry>
+    <title>Overview</title>
+    <id>item-5d0b7d94-1d06-4045-b30e-c219666447d7</id>
+    <updated>2026-10-30T18:06:59.000Z</updated>
+    <published>2026-10-30T18:06:59.000Z</published>
+    <summary></summary>
+    <link href="https://localhost/appstore-spec-docs/welcome"/>
+    
+    <content type="html">
+      <![CDATA[ <p>appstore-spec documents the HAX appstore specification: the schema that defines external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.</p>
+<p>An appstore payload is typically returned by a backend endpoint (for example <code>generateAppStore</code>) or loaded from a static JSON file. HAX reads these keys at the top level via <code>HaxStore._loadAppStoreData</code> in webcomponents <code>elements/hax-body/lib/hax-store.js</code>. A payload wrapped in <code>{ "data": { ... } }</code> is ignored.</p>
+<h2>Root structure</h2>
+<p>An appstore payload usually looks like:</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "status": 200,
+  "apps": [],
+  "stax": [],
+  "autoloader": {}
+}
+</template>
+</code-sample>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">Top-level keys</h2>
+<div slot="content">
+<ul>
+<li><strong>status</strong> — numeric status code (typically <code>200</code>).</li>
+<li><strong>apps</strong> — array of app provider definitions (<code>hax-app</code> data).</li>
+<li><strong>stax</strong> — array of reusable content stacks (<code>hax-stax</code> data).</li>
+<li><strong>autoloader</strong> — object or array of custom element imports to preload.</li>
+</ul>
+</div>
+</a11y-collapse>
+<p><code>example.json</code> in the repository has a representative payload derived from current HAX integrations, and the <code>examples/</code> directory has more, including an <code>invalid/</code> subfolder of mistakes the validator catches.</p>
+<h2>Machine-readable schema and validation</h2>
+<p><code>schema/appstore.schema.json</code> is JSON Schema draft 2020-12 with the behavior notes in this documentation embedded as descriptions. <code>scripts/validate.js</code> adds checks a schema cannot express, including:</p>
+<ul>
+<li>credentials committed in <code>data</code> / <code>headers</code></li>
+<li><code>search</code> keys HAX ignores</li>
+<li>select options that all share one value</li>
+<li><code>gizmo.type</code> written as a literal instead of a path</li>
+<li><code>_url_source</code> without a <code>gizmo.id</code></li>
+<li>duplicate app titles</li>
+</ul>
+<p>From npm, without installing anything:</p>
+<code-sample type="javascript" copy-clipboard-button="copy-clipboard-button">
+<template>
+npx -p @haxtheweb/appstore-spec appstore-validate path/to/appstore.json
+</template>
+</code-sample>
+<p>From a clone of this repository:</p>
+<code-sample type="javascript" copy-clipboard-button="copy-clipboard-button">
+<template>
+npm install
+node scripts/validate.js example.json examples/*.json
+node scripts/validate.js --json path/to/appstore.json
+npm test
+</template>
+</code-sample> ]]>
+    </content>
+  </entry>
+  <entry>
+    <title>Apps &amp; Connections</title>
+    <id>item-e5f1a280-609c-4375-b28d-7ce7eb733401</id>
+    <updated>2026-10-30T18:09:11.000Z</updated>
+    <published>2026-10-30T18:09:11.000Z</published>
+    <summary></summary>
+    <link href="https://localhost/appstore-spec-docs/apps-connections"/>
+    
+    <content type="html">
+      <![CDATA[ <p>Each item in <code>apps</code> is a provider definition with a <code>details</code> block (display information) and a <code>connection</code> block (how HAX talks to the provider).</p>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">details fields</h2>
+<div slot="content">
+<ul>
+<li><strong>title</strong> — provider display label.</li>
+<li><strong>icon</strong> — icon used in the HAX UI.</li>
+<li><strong>color</strong> — accent color for the provider card.</li>
+<li><strong>author</strong> — provider owner / source.</li>
+<li><strong>description</strong> — short description shown in the UI.</li>
+<li><strong>status</strong> — provider state (commonly <code>available</code>).</li>
+<li><strong>tags</strong> — searchable categorization terms.</li>
+<li><strong>tos</strong> — optional terms / policy links.</li>
+</ul>
+</div>
+</a11y-collapse>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">connection fields</h2>
+<div slot="content">
+<ul>
+<li><strong>protocol</strong> — <code>http</code> or <code>https</code>.</li>
+<li><strong>url</strong> — provider host and base path, <strong>without</strong> the protocol.</li>
+<li><strong>headers</strong> — optional request headers.</li>
+<li><strong>data</strong> — default query values sent with every operation.</li>
+<li><strong>auto</strong> — optional boolean, default <code>true</code>: run the browse request as soon as the app is activated.</li>
+<li><strong>operations</strong> — <code>browse</code> (required) and optionally <code>add</code>. HAX does not read any other operation names.</li>
+</ul>
+</div>
+</a11y-collapse>
+<p>When the HAXcms platform setting disables <code>onlineMedia</code>, only apps with an <code>add</code> operation are loaded.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "details": {
+    "title": "Youtube",
+    "icon": "mdi-social:youtube",
+    "color": "red",
+    "author": "Google, Youtube LLC",
+    "description": "The most popular online video sharing and remix site.",
+    "status": "available",
+    "tags": ["video"]
+  },
+  "connection": {
+    "protocol": "https",
+    "url": "www.googleapis.com/youtube/v3",
+    "data": {
+      "key": "{{YOUTUBE_API_KEY}}"
+    },
+    "operations": {}
+  }
+}
+</template>
+</code-sample>
+<p>Build URLs the way HAX does: <code>protocol + "://" + url + "/" + endPoint</code>. So <code>connection.url</code> has no protocol, and an operation's <code>endPoint</code> has no leading slash.</p>
+<p>Never commit real credentials. Use a <code>{{NAME}}</code> placeholder the backend fills in, or broker the request through your backend (HAXcms does this). <code>site_token</code> in <code>data</code> is sent as the <code>X-HAXCMS-Site-Token</code> header, and a HAXcms session JWT is added as an <code>Authorization: Bearer</code> header automatically.</p> ]]>
+    </content>
+  </entry>
+  <entry>
+    <title>Operations</title>
+    <id>item-6794d59f-b4f0-48e5-9e50-c8e78de1f37c</id>
+    <updated>2026-10-30T18:09:16.000Z</updated>
+    <published>2026-10-30T18:09:16.000Z</published>
+    <summary></summary>
+    <link href="https://localhost/appstore-spec-docs/operations"/>
+    
+    <content type="html">
+      <![CDATA[ <p>Operations define how HAX talks to a provider. Each app's <code>connection.operations</code> object supports a required <code>browse</code> operation and an optional <code>add</code> operation.</p>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">Common operation fields</h2>
+<div slot="content">
+<ul>
+<li><strong>method</strong> — HTTP method (<code>GET</code>, <code>POST</code>, etc).</li>
+<li><strong>endPoint</strong> — path appended to <code>connection.url</code> after a <code>/</code> (no leading slash).</li>
+<li><strong>data</strong> — request query values, merged over <code>connection.data</code>.</li>
+<li><strong>resultMap</strong> — path mappings from the provider response into HAX preview/gizmo data.</li>
+</ul>
+</div>
+</a11y-collapse>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">Browse-only fields</h2>
+<div slot="content">
+<ul>
+<li><strong>search</strong> — search inputs. Only the first key is used: Merlin's "Search &lt;app title&gt;" command sends the user's text as that query parameter. Further keys, and the legacy <code>format</code> / <code>items</code> / <code>slot</code> / <code>component</code> hints, are not rendered by current HAX, so put fixed filters in <code>data</code>.</li>
+<li><strong>pagination</strong> — <code>{ style: "page" | "offset" | "link", props: {...} }</code>. Stored but not used by any HAX UI today.</li>
+</ul>
+</div>
+</a11y-collapse>
+<h2>Browse operation</h2>
+<p><code>browse</code> is the standard operation for searching and selecting media.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "browse": {
+    "method": "GET",
+    "endPoint": "search",
+    "pagination": {
+      "style": "page",
+      "props": {
+        "previous": "prevPageToken",
+        "next": "nextPageToken",
+        "total_items": "pageInfo.totalResults"
+      }
+    },
+    "search": {
+      "q": {
+        "title": "Search",
+        "type": "string"
+      }
+    },
+    "data": {
+      "part": "snippet",
+      "type": "video",
+      "maxResults": "20"
+    },
+    "resultMap": {
+      "defaultGizmoType": "video",
+      "items": "items",
+      "preview": {
+        "title": "snippet.title",
+        "details": "snippet.description",
+        "image": "snippet.thumbnails.default.url",
+        "id": "id.videoId"
+      },
+      "gizmo": {
+        "title": "snippet.title",
+        "description": "snippet.description",
+        "id": "id.videoId",
+        "_url_source": "https://www.youtube.com/watch?v=&lt;%= id %&gt;",
+        "caption": "snippet.description",
+        "citation": "snippet.channelTitle"
+      }
+    }
+  }
+}
+</template>
+</code-sample>
+<h2>Add operation</h2>
+<p><code>add</code> is used for upload/create flows, for example local file upload in HAXCMS integrations.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "add": {
+    "method": "POST",
+    "endPoint": "system/saveFile",
+    "acceptsGizmoTypes": ["image", "video", "audio", "pdf", "svg", "document", "csv"],
+    "resultMap": {
+      "item": "data.file",
+      "defaultGizmoType": "image",
+      "gizmo": {
+        "source": "url",
+        "id": "uuid"
+      }
+    }
+  }
+}
+</template>
+</code-sample>
+<p>An <code>add</code> operation needs <code>acceptsGizmoTypes</code>, or the app is never offered as an upload target. <code>*</code> means "files HAX can't classify," not "everything."</p> ]]>
+    </content>
+  </entry>
+  <entry>
+    <title>resultMap &amp; Special Values</title>
+    <id>item-b8dabe1b-1119-465f-9e5d-0abf03efcf5a</id>
+    <updated>2026-10-30T18:09:20.000Z</updated>
+    <published>2026-10-30T18:09:20.000Z</published>
+    <summary></summary>
+    <link href="https://localhost/appstore-spec-docs/resultmap-special-values"/>
+    
+    <content type="html">
+      <![CDATA[ <p><code>resultMap</code> maps upstream API response data into HAX item previews and final gizmo values.</p>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">resultMap fields</h2>
+<div slot="content">
+<ul>
+<li><strong>items</strong> — dot path to the array of result records. If it doesn't resolve, the whole response is used as the array.</li>
+<li><strong>preview</strong> — fields shown in result cards: <code>title</code>, <code>details</code> (HTML stripped) and <code>id</code> are required; <code>image</code> is optional, with <code>resultMap.image</code> as a fixed fallback.</li>
+<li><strong>gizmo</strong> — target value to dot path mappings. These become the inserted element's properties via <code>guessGizmo</code>.</li>
+<li><strong>defaultGizmoType</strong> — gizmo type for every result (<code>image</code>, <code>video</code>, <code>audio</code>, <code>pdf</code>, <code>document</code>, <code>content</code>, <code>wikipedia</code>, ...).</li>
+<li><strong>gizmo.type</strong> / <strong>gizmo.mimetype</strong> — <em>paths</em> whose resolved value picks the gizmo type per result (e.g. <code>"type": "data.0.media_type"</code>). Writing <code>"type": "video"</code> looks up <code>result.video</code> instead of using the literal.</li>
+<li><strong>_url_source</strong> — URL template; the first <code>&lt;%= id %&gt;</code> is replaced by the mapped <code>gizmo.id</code>, and the result becomes <code>source</code> and <code>url</code>.</li>
+</ul>
+</div>
+</a11y-collapse>
+<p>Any <code>preview</code> or <code>gizmo</code> value can use the split rule to take one piece of a string:</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "property": "uri",
+  "op": "split",
+  "delimiter": "/",
+  "position": 2
+}
+</template>
+</code-sample>
+<p>See <code>examples/split-id.json</code> in the repository for a full working example.</p>
+<p><code>add</code> result maps use <code>item</code> (a path to the uploaded record, e.g. <code>data.file</code>) instead of <code>items</code>.</p>
+<h2>Special request values</h2>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">Recognized special values</h2>
+<div slot="content">
+<ul>
+<li><strong>site_token</strong> / <strong>siteToken</strong> in <code>data</code> — sent as the <code>X-HAXCMS-Site-Token</code> header, never in the query string.</li>
+<li><strong>__HAXAPPENDUPLOADENDPOINT__: true</strong> — prepends <code>HaxStore.connectionRewrites.appendUploadEndPoint</code> to the query (used for HAXcms local files).</li>
+<li>Array values repeat the parameter; <code>null</code> sends the bare key.</li>
+<li>A HAXcms session JWT, when present, is sent as <code>Authorization: Bearer &lt;jwt&gt;</code> unless you set <code>Authorization</code> yourself. The older <code>__HAXJWT__</code> placeholder is no longer read.</li>
+</ul>
+</div>
+</a11y-collapse> ]]>
+    </content>
+  </entry>
+  <entry>
+    <title>Stax &amp; Autoloader</title>
+    <id>item-205ac627-1f06-4821-8bfd-dad2341a8b07</id>
+    <updated>2026-10-30T18:09:24.000Z</updated>
+    <published>2026-10-30T18:09:24.000Z</published>
+    <summary></summary>
+    <link href="https://localhost/appstore-spec-docs/stax-autoloader"/>
+    
+    <content type="html">
+      <![CDATA[ <h2>Stax</h2>
+<p><code>stax</code> is an array of named content stacks (HAX elements) users can insert as reusable patterns.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "details": {
+    "title": "Two column Article",
+    "author": "HAXTheWeb core team",
+    "description": "Content with media to right",
+    "status": "available",
+    "tags": ["media"]
+  },
+  "stax": [
+    {
+      "tag": "grid-plate",
+      "properties": {
+        "layout": "2-1"
+      },
+      "content": "&lt;p slot=\"col-1\"&gt;Example text&lt;/p&gt;&lt;media-image slot=\"col-2\" source=\"https://example.org/image.jpg\"&gt;&lt;/media-image&gt;"
+    }
+  ]
+}
+</template>
+</code-sample>
+<h2>Autoloader</h2>
+<p><code>autoloader</code> declares custom elements that should be available to HAX. Two formats are supported:</p>
+<ul>
+<li>An object map: <code>tagName -&gt; importPath</code>, or <code>tagName -&gt; { "import": path, "haxProperties": {...} }</code> to ship an element's HAX definition over the wire.</li>
+<li>An array of tag names, each imported from <code>@haxtheweb/&lt;tag&gt;/&lt;tag&gt;.js</code>. This is what the HAXcms PHP and Node.js backends emit.</li>
+</ul>
+<p>HAXcms filters the autoloader by <code>settings/enabledBlocks.json</code> when that file exists.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "autoloader": {
+    "media-image": "@haxtheweb/media-image/media-image.js",
+    "video-player": "@haxtheweb/video-player/video-player.js",
+    "grid-plate": "@haxtheweb/grid-plate/grid-plate.js"
+  }
+}
+</template>
+</code-sample>
+<h2>Integration notes</h2>
+<ul>
+<li>Backends can serve appstore payloads from static JSON or dynamic endpoint generation.</li>
+<li>In HAXCMS, provider search can be brokered through backend endpoints so API keys are not exposed to the browser.</li>
+<li>For HAXCMS local file integrations, <code>__HAXAPPENDUPLOADENDPOINT__</code> and <code>site_token</code> are the recognized special values.</li>
+</ul>
+<h2>Rules for tools and agents writing appstore payloads</h2>
+<ol>
+<li>Keep keys at the top level (<code>status</code>, <code>apps</code>, <code>stax</code>, <code>autoloader</code>). Custom keys must start with <code>x-</code>.</li>
+<li>Build URLs the way HAX does: <code>protocol + "://" + url + "/" + endPoint</code>. So <code>connection.url</code> has no protocol, and <code>endPoint</code> has no leading slash.</li>
+<li>Never commit real credentials. Use a <code>{{NAME}}</code> placeholder the backend fills in, or broker the request through your backend.</li>
+<li>Put the text query first in <code>browse.search</code>. Only the first key is used.</li>
+<li><code>resultMap</code> values are dot paths into each result, including <code>gizmo.type</code> and <code>gizmo.mimetype</code>. Use <code>defaultGizmoType</code> for a fixed type. <code>preview.title</code>, <code>preview.details</code> and <code>preview.id</code> are required.</li>
+<li><code>add</code> operations need <code>acceptsGizmoTypes</code>, or the app is never offered as an upload target.</li>
+<li>Validate with <code>scripts/validate.js</code> before shipping a payload.</li>
+</ol> ]]>
+    </content>
+  </entry>
+  <entry>
+    <title>More Schemas</title>
+    <id>item-fe2c6999-920e-4df3-8b80-aff167b827b1</id>
+    <updated>2026-10-30T18:09:29.000Z</updated>
+    <published>2026-10-30T18:09:29.000Z</published>
+    <summary></summary>
+    <link href="https://localhost/appstore-spec-docs/more-schemas"/>
+    
+    <content type="html">
+      <![CDATA[ <p>appstore-spec is one of several schema specifications in the HAX ecosystem. Explore the others:</p>
+<ul>
+<li><a href="https://haxtheweb.github.io/json-outline-schema/">JSON Outline Schema</a> — the content structure, site navigation, and metadata schema used by HAXcms.</li>
+<li><a href="https://haxtheweb.github.io/hax-schema/">HAX Schema</a> — the full haxProperties contract for element authoring.</li>
+<li><a href="https://haxtheweb.github.io/hax-element-schema/">HAX Element Schema</a> — the lightweight virtual DOM object format used for demoSchema, insertion, and conversion workflows.</li>
+<li><a href="https://haxtheweb.github.io/merlin-schema/">Merlin Schema</a> — the schema for Merlin's conversational options, programs, and voice/shortcut metadata.</li>
+</ul>
+<p>New to HAX? <a href="https://haxtheweb.org/">Get started with HAX</a>.</p> ]]>
+    </content>
+  </entry>
+</feed>

@@ -1,0 +1,55 @@
+<p>Each item in <code>apps</code> is a provider definition with a <code>details</code> block (display information) and a <code>connection</code> block (how HAX talks to the provider).</p>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">details fields</h2>
+<div slot="content">
+<ul>
+<li><strong>title</strong> — provider display label.</li>
+<li><strong>icon</strong> — icon used in the HAX UI.</li>
+<li><strong>color</strong> — accent color for the provider card.</li>
+<li><strong>author</strong> — provider owner / source.</li>
+<li><strong>description</strong> — short description shown in the UI.</li>
+<li><strong>status</strong> — provider state (commonly <code>available</code>).</li>
+<li><strong>tags</strong> — searchable categorization terms.</li>
+<li><strong>tos</strong> — optional terms / policy links.</li>
+</ul>
+</div>
+</a11y-collapse>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">connection fields</h2>
+<div slot="content">
+<ul>
+<li><strong>protocol</strong> — <code>http</code> or <code>https</code>.</li>
+<li><strong>url</strong> — provider host and base path, <strong>without</strong> the protocol.</li>
+<li><strong>headers</strong> — optional request headers.</li>
+<li><strong>data</strong> — default query values sent with every operation.</li>
+<li><strong>auto</strong> — optional boolean, default <code>true</code>: run the browse request as soon as the app is activated.</li>
+<li><strong>operations</strong> — <code>browse</code> (required) and optionally <code>add</code>. HAX does not read any other operation names.</li>
+</ul>
+</div>
+</a11y-collapse>
+<p>When the HAXcms platform setting disables <code>onlineMedia</code>, only apps with an <code>add</code> operation are loaded.</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "details": {
+    "title": "Youtube",
+    "icon": "mdi-social:youtube",
+    "color": "red",
+    "author": "Google, Youtube LLC",
+    "description": "The most popular online video sharing and remix site.",
+    "status": "available",
+    "tags": ["video"]
+  },
+  "connection": {
+    "protocol": "https",
+    "url": "www.googleapis.com/youtube/v3",
+    "data": {
+      "key": "{{YOUTUBE_API_KEY}}"
+    },
+    "operations": {}
+  }
+}
+</template>
+</code-sample>
+<p>Build URLs the way HAX does: <code>protocol + "://" + url + "/" + endPoint</code>. So <code>connection.url</code> has no protocol, and an operation's <code>endPoint</code> has no leading slash.</p>
+<p>Never commit real credentials. Use a <code>{{NAME}}</code> placeholder the backend fills in, or broker the request through your backend (HAXcms does this). <code>site_token</code> in <code>data</code> is sent as the <code>X-HAXCMS-Site-Token</code> header, and a HAXcms session JWT is added as an <code>Authorization: Bearer</code> header automatically.</p>

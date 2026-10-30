@@ -1,0 +1,51 @@
+<p>appstore-spec documents the HAX appstore specification: the schema that defines external media providers, upload targets, reusable stax templates, and autoloaded elements for the HAX editor.</p>
+<p>An appstore payload is typically returned by a backend endpoint (for example <code>generateAppStore</code>) or loaded from a static JSON file. HAX reads these keys at the top level via <code>HaxStore._loadAppStoreData</code> in webcomponents <code>elements/hax-body/lib/hax-store.js</code>. A payload wrapped in <code>{ "data": { ... } }</code> is ignored.</p>
+<h2>Root structure</h2>
+<p>An appstore payload usually looks like:</p>
+<code-sample type="json" copy-clipboard-button="copy-clipboard-button">
+<template>
+{
+  "status": 200,
+  "apps": [],
+  "stax": [],
+  "autoloader": {}
+}
+</template>
+</code-sample>
+<a11y-collapse heading-button="heading-button">
+<h2 slot="heading">Top-level keys</h2>
+<div slot="content">
+<ul>
+<li><strong>status</strong> — numeric status code (typically <code>200</code>).</li>
+<li><strong>apps</strong> — array of app provider definitions (<code>hax-app</code> data).</li>
+<li><strong>stax</strong> — array of reusable content stacks (<code>hax-stax</code> data).</li>
+<li><strong>autoloader</strong> — object or array of custom element imports to preload.</li>
+</ul>
+</div>
+</a11y-collapse>
+<p><code>example.json</code> in the repository has a representative payload derived from current HAX integrations, and the <code>examples/</code> directory has more, including an <code>invalid/</code> subfolder of mistakes the validator catches.</p>
+<h2>Machine-readable schema and validation</h2>
+<p><code>schema/appstore.schema.json</code> is JSON Schema draft 2020-12 with the behavior notes in this documentation embedded as descriptions. <code>scripts/validate.js</code> adds checks a schema cannot express, including:</p>
+<ul>
+<li>credentials committed in <code>data</code> / <code>headers</code></li>
+<li><code>search</code> keys HAX ignores</li>
+<li>select options that all share one value</li>
+<li><code>gizmo.type</code> written as a literal instead of a path</li>
+<li><code>_url_source</code> without a <code>gizmo.id</code></li>
+<li>duplicate app titles</li>
+</ul>
+<p>From npm, without installing anything:</p>
+<code-sample type="javascript" copy-clipboard-button="copy-clipboard-button">
+<template>
+npx -p @haxtheweb/appstore-spec appstore-validate path/to/appstore.json
+</template>
+</code-sample>
+<p>From a clone of this repository:</p>
+<code-sample type="javascript" copy-clipboard-button="copy-clipboard-button">
+<template>
+npm install
+node scripts/validate.js example.json examples/*.json
+node scripts/validate.js --json path/to/appstore.json
+npm test
+</template>
+</code-sample>

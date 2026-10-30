@@ -1,0 +1,17 @@
+{
+  "id": "item-e5f1a280-609c-4375-b28d-7ce7eb733401",
+  "indent": 0,
+  "location": "pages/item-e5f1a280-609c-4375-b28d-7ce7eb733401/index.json",
+  "slug": "apps-connections",
+  "order": 1,
+  "parent": null,
+  "title": "Apps & Connections",
+  "description": "",
+  "metadata": {
+    "created": 1793383751,
+    "updated": 1793383751,
+    "images": [],
+    "videos": []
+  },
+  "content": "<p>Each item in <code>apps</code> is a provider definition with a <code>details</code> block (display information) and a <code>connection</code> block (how HAX talks to the provider).</p>\n<a11y-collapse heading-button=\"heading-button\">\n<h2 slot=\"heading\">details fields</h2>\n<div slot=\"content\">\n<ul>\n<li><strong>title</strong> — provider display label.</li>\n<li><strong>icon</strong> — icon used in the HAX UI.</li>\n<li><strong>color</strong> — accent color for the provider card.</li>\n<li><strong>author</strong> — provider owner / source.</li>\n<li><strong>description</strong> — short description shown in the UI.</li>\n<li><strong>status</strong> — provider state (commonly <code>available</code>).</li>\n<li><strong>tags</strong> — searchable categorization terms.</li>\n<li><strong>tos</strong> — optional terms / policy links.</li>\n</ul>\n</div>\n</a11y-collapse>\n<a11y-collapse heading-button=\"heading-button\">\n<h2 slot=\"heading\">connection fields</h2>\n<div slot=\"content\">\n<ul>\n<li><strong>protocol</strong> — <code>http</code> or <code>https</code>.</li>\n<li><strong>url</strong> — provider host and base path, <strong>without</strong> the protocol.</li>\n<li><strong>headers</strong> — optional request headers.</li>\n<li><strong>data</strong> — default query values sent with every operation.</li>\n<li><strong>auto</strong> — optional boolean, default <code>true</code>: run the browse request as soon as the app is activated.</li>\n<li><strong>operations</strong> — <code>browse</code> (required) and optionally <code>add</code>. HAX does not read any other operation names.</li>\n</ul>\n</div>\n</a11y-collapse>\n<p>When the HAXcms platform setting disables <code>onlineMedia</code>, only apps with an <code>add</code> operation are loaded.</p>\n<code-sample type=\"json\" copy-clipboard-button=\"copy-clipboard-button\">\n<template>\n{\n  \"details\": {\n    \"title\": \"Youtube\",\n    \"icon\": \"mdi-social:youtube\",\n    \"color\": \"red\",\n    \"author\": \"Google, Youtube LLC\",\n    \"description\": \"The most popular online video sharing and remix site.\",\n    \"status\": \"available\",\n    \"tags\": [\"video\"]\n  },\n  \"connection\": {\n    \"protocol\": \"https\",\n    \"url\": \"www.googleapis.com/youtube/v3\",\n    \"data\": {\n      \"key\": \"{{YOUTUBE_API_KEY}}\"\n    },\n    \"operations\": {}\n  }\n}\n</template>\n</code-sample>\n<p>Build URLs the way HAX does: <code>protocol + \"://\" + url + \"/\" + endPoint</code>. So <code>connection.url</code> has no protocol, and an operation's <code>endPoint</code> has no leading slash.</p>\n<p>Never commit real credentials. Use a <code>{{NAME}}</code> placeholder the backend fills in, or broker the request through your backend (HAXcms does this). <code>site_token</code> in <code>data</code> is sent as the <code>X-HAXCMS-Site-Token</code> header, and a HAXcms session JWT is added as an <code>Authorization: Bearer</code> header automatically.</p>"
+}
